@@ -18,7 +18,11 @@ public final class PinningHandler {
     public synchronized void handle(long eventStartNanos, long durationNanos,
                                     String threadName, String topFrame) {
         long cutoff = System.nanoTime() - windowNanos;
-        timestamps.removeIf(t -> t < cutoff);
+        // JFR delivers events in approximately chronological order, so addLast keeps the
+        // deque in non-decreasing timestamp order; front-trimming is O(1) amortized.
+        while (!timestamps.isEmpty() && timestamps.peekFirst() < cutoff) {
+            timestamps.pollFirst();
+        }
         // Only add the event if it falls within the current window
         if (eventStartNanos >= cutoff) {
             timestamps.addLast(eventStartNanos);
