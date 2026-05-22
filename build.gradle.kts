@@ -46,6 +46,7 @@ tasks.shadowJar {
         )
     }
     minimize()
+    exclude("net/bytebuddy/build/**")
 }
 
 tasks.test {
