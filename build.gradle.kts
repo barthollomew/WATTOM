@@ -28,7 +28,8 @@ tasks.withType<JavaCompile> {
     options.compilerArgs.addAll(listOf(
         "-Xlint:all",
         "-Werror",
-        "-Xlint:-missing-explicit-ctor"
+        "-Xlint:-missing-explicit-ctor",
+        "-Xlint:-classfile"
     ))
 }
 
