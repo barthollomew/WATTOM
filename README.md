@@ -1,36 +1,54 @@
 # WATTOM
 
-Hot-attach JVM diagnostic agent. Streams JFR events, detects virtual thread pinning and
-carrier starvation, traces lock contention, instruments methods via ByteBuddy, and renders
-a live ANSI dashboard. No runtime dependencies beyond ByteBuddy.
+Hot-attach JVM diagnostic agent for production JVMs. No restart required.
 
-## Build
+Streams JFR events, detects virtual thread pinning and carrier starvation, tracks heap
+and TLAB allocation rates, detects deadlocks, and instruments individual methods for
+real-time p99 latency. Renders a live ANSI dashboard in your terminal.
+
+Single JAR, no runtime dependencies beyond ByteBuddy.
+
+## Install
 
 ```bash
 ./gradlew shadowJar
+# output: build/libs/wattom.jar
 ```
-
-Output: `build/libs/wattom.jar`
 
 ## Usage
 
+Attach to a running JVM by PID:
+
 ```bash
-java -jar build/libs/wattom.jar --pid <TARGET_PID>
-java -jar build/libs/wattom.jar --pid <TARGET_PID> --trace com.example.Foo#bar --refresh 250
+java -jar wattom.jar --pid <PID>
 ```
 
-Press Ctrl+C to exit cleanly. The agent detaches and reverts all instrumentation.
+Trace a specific method and set a custom refresh rate:
+
+```bash
+java -jar wattom.jar --pid <PID> --trace com.example.OrderService#process --refresh 250
+```
+
+Press Ctrl+C to detach. All instrumentation is reverted and the socket is cleaned up.
+
+## Flags
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--pid` | required | Target JVM process ID |
+| `--trace` | off | Method to trace, format: `ClassName#methodName` |
+| `--refresh` | 500 | Dashboard refresh interval in milliseconds |
 
 ## Requirements
 
-- Java 21+ on both launcher and target JVM
-- Target JVM must allow attach (`-XX:+DisableAttachMechanism` must not be set)
-- JFR must not be disabled
-
-See RUNBOOK.md for diagnostic scenarios and ARCHITECTURE.md for design details.
+- Java 21+ on both the launcher and the target JVM
+- JFR must be enabled (do not set `-XX:-FlightRecorder`)
+- Target JVM must allow attach (do not set `-XX:+DisableAttachMechanism`)
 
 ## Tests
 
 ```bash
 ./gradlew clean test
 ```
+
+See [RUNBOOK.md](RUNBOOK.md) for diagnostic scenarios and [ARCHITECTURE.md](ARCHITECTURE.md) for design details.
