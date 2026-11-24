@@ -1,10 +1,10 @@
-# WATTOM
+# what-locked-my-jvm
 
 Your Java service is slow or frozen in production. If you restart it to add profiling flags you lose the bug.
 
-WATTOM is a hot-attach diagnostic agent for Java 21. You do not need to restart your service. You do not need pre-configured flags.
+`what-locked-my-jvm` (built as `wattom.jar`) is a hot-attach diagnostic agent for Java 21. You do not need to restart your service. You do not need pre-configured flags.
 
-Point WATTOM at a running Java process ID:
+Point it at a running Java process ID:
 
 ```bash
 java -jar wattom.jar --pid 12345
