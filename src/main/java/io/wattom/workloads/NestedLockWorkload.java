@@ -9,7 +9,7 @@ package io.wattom.workloads;
 public final class NestedLockWorkload {
     static final int  LOCK_DEPTH = 8;
     static final int  VT_COUNT   = 16;
-    static final long HOLD_MS    = 100L; // > JFR threshold of 20 ms
+    static final long HOLD_MS    = 100L;
 
     public static void main(String[] args) throws Exception {
         Object[] locks = new Object[LOCK_DEPTH];

@@ -50,7 +50,6 @@ class NestedLockChaosIT {
 
         List<JvmHandle> handles = new ArrayList<>();
         try {
-            // ── Launch all child JVMs ───────────────────────────────────────────
             for (int i = 0; i < jvmCount; i++) {
                 Process child = new ProcessBuilder(
                     javaCmd, "-Xmx64m", "-cp", agentJar,
@@ -62,7 +61,6 @@ class NestedLockChaosIT {
                 AtomicInteger pins = new AtomicInteger(0);
                 CountDownLatch readyLatch = new CountDownLatch(1);
 
-                // Drain stdout until "READY" on a daemon virtual thread.
                 Thread.ofVirtual().name("ready-drainer-" + i).start(() -> {
                     try (var r = child.inputReader()) {
                         String line;
@@ -81,22 +79,18 @@ class NestedLockChaosIT {
                 handles.add(new JvmHandle(child, sock, receiver, snaps, pins, readyLatch));
             }
 
-            // ── Wait for all JVMs to be ready ───────────────────────────────────
             for (JvmHandle h : handles) {
                 boolean ok = h.ready().await(20, TimeUnit.SECONDS);
                 assertTrue(ok, "Child JVM (pid=" + h.process().pid() + ") never printed READY");
             }
 
-            // ── Attach WATTOM to each child JVM ─────────────────────────────────
             for (JvmHandle h : handles) {
                 String pid = String.valueOf(h.process().pid());
                 AttachHelper.attach(pid, agentJar, "socketPath=" + h.sockPath());
             }
 
-            // ── Run for configured duration ──────────────────────────────────────
             Thread.sleep(durationSec * 1_000L);
 
-            // ── Assertions ───────────────────────────────────────────────────────
             for (int i = 0; i < handles.size(); i++) {
                 JvmHandle h = handles.get(i);
                 String label = "JVM-" + i + " (pid=" + h.process().pid() + ")";

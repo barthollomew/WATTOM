@@ -23,7 +23,6 @@ public final class PinningHandler {
         while (!timestamps.isEmpty() && timestamps.peekFirst() < cutoff) {
             timestamps.pollFirst();
         }
-        // Only add the event if it falls within the current window
         if (eventStartNanos >= cutoff) {
             timestamps.addLast(eventStartNanos);
         }

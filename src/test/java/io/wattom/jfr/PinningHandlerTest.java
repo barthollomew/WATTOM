@@ -9,7 +9,7 @@ class PinningHandlerTest {
     @Test
     void pinnedCountIncreasesOnHandle() {
         var store   = new MetricsStore();
-        var handler = new PinningHandler(store, 10_000_000_000L); // 10s window
+        var handler = new PinningHandler(store, 10_000_000_000L);
         assertEquals(0, store.snapshot().pinnedVtCount());
         handler.handle(System.nanoTime(), 50_000_000L, "Thread-1", "java.io.Foo.bar");
         assertEquals(1, store.snapshot().pinnedVtCount());
@@ -20,8 +20,7 @@ class PinningHandlerTest {
     @Test
     void staleEventsExpireFromWindow() {
         var store   = new MetricsStore();
-        var handler = new PinningHandler(store, 1_000_000L); // 1ms window
-        // Inject an event timestamped 5ms in the past - older than the 1ms window
+        var handler = new PinningHandler(store, 1_000_000L);
         handler.handle(System.nanoTime() - 5_000_000L, 50_000_000L, "T1", "foo");
         assertEquals(0, store.snapshot().pinnedVtCount());
     }

@@ -23,7 +23,7 @@ class MethodLatencyStatsTest {
     void ringBufferWrapsOldestEntry() {
         var stats = new MethodLatencyStats(3);
         stats.record(100); stats.record(200); stats.record(300);
-        stats.record(400); // evicts 100; ring: [400, 200, 300]
+        stats.record(400);
         assertEquals(400L, stats.p99Nanos());
     }
 

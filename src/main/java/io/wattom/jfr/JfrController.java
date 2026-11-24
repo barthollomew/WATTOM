@@ -3,6 +3,7 @@ package io.wattom.jfr;
 import io.wattom.metrics.MetricsStore;
 import jdk.jfr.consumer.RecordingStream;
 import java.time.Duration;
+import java.time.Instant;
 
 public final class JfrController implements AutoCloseable {
     private final RecordingStream stream;
@@ -19,8 +20,9 @@ public final class JfrController implements AutoCloseable {
         stream.enable("jdk.CPULoad").withPeriod(Duration.ofMillis(500));
         stream.enable("jdk.ObjectAllocationInNewTLAB");
 
+        // Convert JFR epoch Instant to the System.nanoTime() clock used by PinningHandler.
         stream.onEvent("jdk.VirtualThreadPinned", e -> pinning.handle(
-            e.getStartTime().toEpochMilli() * 1_000_000L,
+            System.nanoTime() - Math.max(0L, Duration.between(e.getStartTime(), Instant.now()).toNanos()),
             e.getDuration().toNanos(),
             e.getThread("eventThread") != null
                 ? e.getThread("eventThread").getJavaName() : "unknown",
