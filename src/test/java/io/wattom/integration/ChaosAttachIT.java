@@ -28,7 +28,7 @@ class ChaosAttachIT {
 
         try (var reader = child.inputReader()) {
             String line;
-            while ((line = reader.readLine()) != null && !line.contains("READY")) { /* spin */ }
+            while ((line = reader.readLine()) != null && !line.contains("READY")) {}
         }
 
         String pid = String.valueOf(child.pid());

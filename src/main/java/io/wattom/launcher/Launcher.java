@@ -13,7 +13,19 @@ public final class Launcher {
     private Launcher() {}
 
     public static void main(String[] args) throws Exception {
-        CliArgs cli = CliArgs.parse(args);
+        CliArgs cli;
+        try {
+            cli = CliArgs.parse(args);
+        } catch (IllegalArgumentException e) {
+            System.err.println(e.getMessage());
+            System.err.println(CliArgs.USAGE);
+            System.exit(1);
+            return;
+        }
+        if (cli.help()) {
+            System.out.println(CliArgs.USAGE);
+            return;
+        }
 
         String selfJar = new File(
             Launcher.class.getProtectionDomain().getCodeSource().getLocation().toURI()
@@ -42,7 +54,6 @@ public final class Launcher {
                 Terminal.clearScreen();
                 System.out.print(AnsiRenderer.render(latest.get(), cols));
                 System.out.flush();
-                //noinspection BusyWait
                 Thread.sleep(cli.refreshMs());
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();

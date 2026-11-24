@@ -16,6 +16,7 @@ Exit with Ctrl+C. All instrumentation is safely reverted.
 | `--pid <PID>` | required | Target JVM process ID |
 | `--trace <Class#method>` | off | Enable per-method p99 latency tracing |
 | `--refresh <ms>` | 500 | Dashboard refresh interval |
+| `-h, --help` | off | Print usage and exit |
 
 ## Scenario 1: High CPU
 

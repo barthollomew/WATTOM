@@ -4,10 +4,11 @@ Your Java service is slow or frozen in production. If you restart it to add prof
 
 `what-locked-my-jvm` (built as `wattom.jar`) is a hot-attach diagnostic agent for Java 21. You do not need to restart your service. You do not need pre-configured flags.
 
-Point it at a running Java process ID:
+Build the self-contained JAR and point it at a running Java process ID:
 
 ```bash
-java -jar wattom.jar --pid 12345
+./gradlew shadowJar
+java -jar build/libs/wattom.jar --pid 12345
 ```
 
 WATTOM attaches instantly. It opens a live terminal dashboard showing CPU usage, memory allocation rates, deadlocked threads, and pinned Java 21 virtual threads. You can also trace p99 latency on any method using `--trace com.example.OrderService#process`.
@@ -18,12 +19,13 @@ Press Ctrl+C to detach. All code instrumentation reverts and sockets clean up sa
 
 ```text
 == WATTOM ========================================================
-CPU       JVM 42%    [██████████----------]  Machine 65%
-G1 Eden   128MB / 512MB    [██████--------------]
-G1 Old    1024MB / 2048MB  [██████████----------]
+CPU       JVM 42%   [###########              ]  Machine 65%
+G1 Eden   [######                   ]   128MB / 512MB
+G1 Old    [############             ]  1024MB / 2048MB
 Pinned VT count=2    starvation=25.0%  carriers=8
 Alloc     4.2MB/sec
-Tracer    com.example.OrderService#process: count=1280 p99=4.8ms avg=1.2ms
+Tracer
+  com.example.OrderService#process: count=1280 p99=4.8ms
 ```
 
 ## How It Works
@@ -38,9 +40,10 @@ Inside the target process, the agent runs lightweight collectors:
 
 ## Test Suite
 
-WATTOM includes 10 test classes to ensure reliability:
+WATTOM includes 11 test classes to ensure reliability:
 
 Unit tests:
+- `CliArgsTest`
 - `DeadlockDetectorTest`
 - `PinningHandlerTest`
 - `MethodLatencyStatsTest`
